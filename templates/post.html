@@ -1,0 +1,16 @@
+{% extends 'default.html' %}
+
+{% load my_filters %}
+
+{% block title %}
+Post
+{% endblock title %}
+
+{% block content %}
+
+<h3>{{ postView.title|censor }}</h3>
+<h2><u>{{ postView.created_at|date:'d-m-Y H:i' }}</u></h2>
+<p align="justify">{{ postView.text|censor }}</p>
+<h3><a href="/news">Возврат в ленту --></a></h3>
+
+{% endblock %}

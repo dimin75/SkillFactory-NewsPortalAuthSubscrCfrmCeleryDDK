@@ -1,0 +1,77 @@
+SuperUser:
+Login: user
+Pass: user
+work with users: user3, user4, user5
+user3@example.com
+login: user3
+password: 1234pass3
+user4@example.com
+login: user4
+password: 1234pass4
+user5@example.com
+login: user5
+password: 1234pass5
+=============================================================================
+Howto load news to database from django console.
+Use:
+python manage.py shell
+Then run following commands from there:
+=============================================================================
+import os
+from news.models import *
+
+print("Работа с user3:")
+directory_path = './newsuser3/'
+user3 = User.objects.get(username='user3')
+user4 = User.objects.get(username='user4')
+
+author3 = Author.objects.get(user=user3)
+# if not exists then author3 = Author.objects.create(user=user3) 
+author4 = Author.objects.get(user=user4)
+# if not exists then author4 = Author.objects.create(user=user4) 
+
+# 3. Добавить 4 категории в модель Category.
+category1 = Category.objects.create(name='Спорт')
+category2 = Category.objects.create(name='Политика')
+category3 = Category.objects.create(name='Культура')
+category4 = Category.objects.create(name='Наука')
+
+category_mapping = {
+    'Спорт': Category.objects.get(name='Спорт'),
+    'Политика': Category.objects.get(name='Политика'),
+    'Культура': Category.objects.get(name='Культура'),
+    'Наука': Category.objects.get(name='Наука'),
+}
+
+files = os.listdir(directory_path)
+
+for file_name in files:
+    file_path = os.path.join(directory_path, file_name)
+    category_name,  post_title_with_extension = file_name.split('_', 1)
+    post_title = post_title_with_extension[:-4]
+    category = category_mapping.get(category_name.strip())
+    if category:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            post_text = file.read()
+        post = Post.objects.create(author=author3, post_type=Post.news, title=post_title, text=post_text, rating=0)
+        post.categories.add(category)
+        print(f'Добавлена новость: {post.title} в категорию {category.name}')
+    else:
+        print(f'Ошибка: Неверная категория "{category_name.strip()}" в файле {file_name}')
+
+print("Работа с user4:")
+directory_path2 = './newsuser4/'
+files2 = os.listdir(directory_path2)
+for file_name2 in files2:
+    file_path = os.path.join(directory_path2, file_name2)
+    category_name,  post_title_with_extension = file_name2.split('_', 1)
+    post_title = post_title_with_extension[:-4]
+    category = category_mapping.get(category_name.strip())
+    if category:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            post_text = file.read()
+        post = Post.objects.create(author=author4, post_type=Post.news, title=post_title, text=post_text, rating=0)    
+        post.categories.add(category)
+        print(f'Добавлена новость: {post.title} в категорию {category.name}')
+    else:
+        print(f'Ошибка: Неверная категория "{category_name.strip()}" в файле {file_name2}')

@@ -1,0 +1,21 @@
+{% extends 'default.html' %}
+
+{% load my_filters %}
+
+
+{% block title %}
+Post
+{% endblock title %}
+
+{% block content %}
+<h2>Редактирование новости</h2>
+
+<form method="POST">
+    {% csrf_token %}
+<table align="center">
+    {{ form }}
+</table>
+    <input type="submit" value="Сохранить">
+</form>
+
+{% endblock content %}

@@ -1,0 +1,14 @@
+{% extends 'default.html' %}
+
+{% block content %}
+{% if request.user.is_authenticated %}
+<h2> Выход из системы. </h2>
+<h3> Уверены? </h3>
+<form class="logout" method="POST"  action="{% url 'logout' %}">
+    {% csrf_token %}
+    <input type="submit" value=Выйти>
+{% else %}
+<h2> Вы вышли. </h2>
+       <h3> <a  href="/news/"> К новостям </a></h3>
+{% endif %}
+{% endblock %}
