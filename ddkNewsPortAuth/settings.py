@@ -27,21 +27,7 @@ SECRET_KEY = 'django-insecure-rqy*gi=3n*e=_p19a8!m5_tgua7v=t1n=cr0xa#&x8f6-(9(f%
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1']
-# This auth works with username and his pass
-# ACCOUNT_EMAIL_REQUIRED = False
-# ACCOUNT_UNIQUE_EMAIL = True
-# ACCOUNT_USERNAME_REQUIRED = True
-# ACCOUNT_AUTHENTICATION_METHOD = 'username'
-# ACCOUNT_EMAIL_VERIFICATION = 'none'
 
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'username'
-# ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
-# ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
-# ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
 # ACCOUNT_FORMS = {'signup': 'sign.models.BasicSignupForm'}
 
@@ -64,11 +50,27 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'sign',
     # 'protect',
-    'news',
+    #'news',
+    'news.apps.NewsConfig',
+    'django_apscheduler',
 ]
 
-ACCOUNT_FORMS = {'login': 'sign.forms.BasicLoginForm',
-                 'signup': 'sign.forms.BasicSignupForm'}
+# Format string for displaying run time timestamps in the Django admin site. The default
+# just adds seconds to the standard Django format, which is useful for displaying the timestamps
+# for jobs that are scheduled to run on intervals of less than one minute.
+#
+# See https://docs.djangoproject.com/en/dev/ref/settings/#datetime-format for format string
+# syntax details.
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+
+# Maximum run time allowed for jobs that are triggered manually via the Django admin site, which
+# prevents admin site HTTP requests from timing out.
+#
+# Longer running jobs should probably be handed over to a background task processing library
+# that supports multiple background worker processes instead (e.g. Dramatiq, Celery, Django-RQ,
+# etc. See: https://djangopackages.org/grids/g/workers-queues-tasks/ for popular options).
+APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -146,12 +148,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
+TIME_ZONE = 'Australia/Sydney'
 
 USE_I18N = True
 
-USE_TZ = True
-
+# USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -173,3 +176,27 @@ LOGIN_REDIRECT_URL = '/news/'
 # ACCOUNT_ADAPTER = 'ddkNewsPortAuth.adapters.CustomAccountAdapter'
 
 SITE_ID = 1
+
+ACCOUNT_FORMS = {'login': 'sign.forms.BasicLoginForm',
+                 'signup': 'sign.forms.BasicSignupForm'}
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+# ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+# ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+# ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+# ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+
+EMAIL_HOST_USER = 'dimatest24@yandex.ru'
+EMAIL_HOST_PASSWORD = 'kdthwdspmptaqzov'
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER

@@ -35,6 +35,11 @@
                                 Добавить новость
                             </a>
                         </li>
+                       <li class="nav-item active">
+                           {% if request.user.is_authenticated %}
+                                <a class="nav-link" href="/subscriptions">Подписки</a>
+                           {% endif %}
+                       </li>
                         <li class="nav-item">
                             {% if request.user.is_authenticated %}
                             <a class="nav-link"  href="/accounts/logout/">

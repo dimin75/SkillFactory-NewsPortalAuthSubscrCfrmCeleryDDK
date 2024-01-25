@@ -51,9 +51,6 @@ class Post(models.Model):
     article = "AR"
     news = "NW"
     author = models.ForeignKey(Author,on_delete=models.CASCADE)
-    # author = models.ForeignKey(Author,
-    #                            on_delete=models.CASCADE,
-    #                            related_name='news_list')
     post_type_choices = [(article, 'Статья'), (news, 'Новость')]
     post_type = models.CharField(max_length=2, choices=post_type_choices)
     created_at = models.DateTimeField(auto_now_add=True)

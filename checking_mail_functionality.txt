@@ -1,0 +1,25 @@
+ python manage.py shell 
+
+from django.core.mail import send_mail
+
+send_mail(
+    'Test Subject',
+    'Test message body',
+    'dimatest24@yandex.ru',
+    ['dmitry.kaplunenko@gmail.com'],
+    fail_silently=False,
+)
+If get '1', then works fine.
+
+# checking record set to display
+
+from news.models import Post
+for post in Post.objects.all():
+    print(post.created_at)
+
+from datetime import datetime, timedelta
+end_date = datetime.now()
+start_date = end_date - timedelta(days=7)
+posts_last_week = Post.objects.filter(created_at__range=(start_date, end_date))
+for post in posts_last_week:
+    print(post.title, post.created_at)
