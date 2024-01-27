@@ -1,1 +1,1 @@
-"# SkillFactory-NewsPortalAuthSubscribeConfirmDDK" 
+"# SkillFactory-NewsPortalAuthSubscrCfrmCeleryDDK" 
