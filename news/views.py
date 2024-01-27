@@ -8,7 +8,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 # from .signals import send_post_notification
-from .signals import notify_news_creator
+# from .signals import notify_news_creator
+from .tasks import new_post_notification #, weekly_notification
 
 # Create your views here.
 class PostView(DetailView):
@@ -51,11 +52,6 @@ class PostCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         form = CreatePostForm(request.POST)
 
         if form.is_valid():
-            # post = Post(
-            #     author=Author.objects.get(user=request.user),
-            #     title=request.POST['title'],
-            #     text=request.POST['text']
-            # )
             post = form.save(commit=False)
             post.author = Author.objects.get(user=request.user)
             post.title = request.POST['title']
@@ -63,53 +59,32 @@ class PostCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
             # post.save()
             try:
                 post.save()
+
+                print('новость сохранена и отправляется...')
+
+                for id in request.POST.getlist('category'):
+                    postCategory = PostCategory(post=post, category=Category.objects.get(pk=id))
+                    postCategory.save()
+
+                subject = f'{post.created_at.strftime("%Y-%M-%d")} вами создана новая новость!'
+                content = render_to_string('post_created_notification.html', {'post': post, })
+                email = request.user.email
+
+                # Отправка уведомлений о новой статье через Celery
+                new_post_notification.delay(subject, email, content)
+                # weekly_notification()
+                print('письмо успешно отправлено.')
+                return redirect('/news/')
                 # код обработки после успешного сохранения
                 return redirect('/news/')  # или куда вам нужно перенаправить после успешного сохранения
-            # except ValidationError as e:
-            #     # Обработка ошибки валидации
-            #     print(f'Validation Error: {e}')
-            #     return render(request, self.template_name, {'form': form, 'error': 'Validation error'})
             except Exception as e:
                 # Обработка других исключений
                 print(f'Error: {e}')
                 print('Все равно возвращаемся на страницу новостей в исходную точку...')
                 return redirect('/news/')
-                # return render(request, self.template_name, {'form': form, 'error': 'An error occurred'})
         else:
             # Форма не прошла валидацию, обработка ошибок или отображение формы с ошибками
             return render(request, self.template_name, {'form': form})
-
-    # def post(self, request, *args, **kwargs):
-    #     post = Post(
-    #         author=Author.objects.get(user=request.user),
-    #         title=request.POST['title'],
-    #         text=request.POST['text']
-    #     )
-    #
-    #     post.save()
-
-        # for id in request.POST.getlist('categories'):
-        #     postCategory = PostCategory(post=post, category=Category.objects.get(pk=id))
-        #     postCategory.save()
-        #
-        # subject = f'{post.created_at.strftime("%Y-%M-%d")} вами создана новая новость!'
-        # content = render_to_string('post_created.html', {'post': post, })
-        # email = request.user.email
-
-        # Отправка уведомлений о новой статье через send_mail()
-        # send_post_notification(subject, email, content)
-
-        # Отправка уведомлений о новой статье через mail_managers()
-        # print('передача из views.py:')
-        # print(subject)
-        # print(content)
-        # print(email)
-        # notify_news_creator(subject=subject, content=content, email=email)
-        # notify_news_creator()
-
-
-
-        # return redirect('/news/')
 
 class PostUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_required = ('news.change_post',)
