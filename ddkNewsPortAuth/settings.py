@@ -195,7 +195,7 @@ EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 
 EMAIL_HOST_USER = 'dimatest24@yandex.ru'
-EMAIL_HOST_PASSWORD = 'kdthwdspmptaqzov'
+EMAIL_HOST_PASSWORD = '_my_wonderful_smtp_sending_password_'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
